@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Late Night Blood Bowl — Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0D1117;--surface:#161B27;--surface-2:#1C2438;
+      --border:#2A3A5C;--red:#CC1F1F;--text:#F0EDE6;--muted:#6B7FA0;
+      --green:#22803D;--font:'Inter',sans-serif;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;}
+    #load-screen{position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;}
+    .load-box{text-align:center;max-width:440px;padding:2rem;}
+    .load-title{font-size:1.3rem;font-weight:600;letter-spacing:0.06em;margin-bottom:0.2rem;}
+    .load-title span{color:var(--red);}
+    .load-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;}
+    .drop-zone{border:2px dashed var(--border);border-radius:8px;padding:2.5rem 2rem;cursor:pointer;transition:all 0.2s;margin-bottom:1rem;}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--red);background:rgba(204,31,31,0.05);}
+    .drop-zone svg{width:36px;height:36px;fill:var(--muted);margin-bottom:0.8rem;}
+    .drop-zone p{font-size:0.85rem;color:var(--muted);}
+    .drop-zone strong{color:var(--text);}
+    .load-or{font-size:0.72rem;color:var(--muted);margin:0.8rem 0;}
+    .btn-fresh{background:none;border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:0.78rem;padding:0.55rem 1.1rem;border-radius:4px;cursor:pointer;transition:all 0.2s;}
+    .btn-fresh:hover{border-color:var(--text);color:var(--text);}
+    .resume-box{margin-top:1.2rem;padding:0.9rem;background:var(--surface);border-radius:6px;border:1px solid var(--border);display:none;}
+    .resume-box p{font-size:0.78rem;color:var(--muted);margin-bottom:0.7rem;}
+    .resume-box strong{color:var(--green);}
+    .btn-resume{background:var(--green);border:none;color:#fff;font-family:var(--font);font-size:0.75rem;font-weight:600;padding:0.45rem 0.9rem;border-radius:4px;cursor:pointer;}
+    #app{display:none;}
+    .header{background:var(--red);padding:0.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .header h1{font-size:0.85rem;font-weight:600;letter-spacing:0.1em;color:#fff;}
+    .header p{font-size:0.68rem;color:rgba(255,255,255,0.6);margin-top:1px;}
+    .header-actions{display:flex;gap:0.5rem;align-items:center;}
+    .btn-dl{background:#fff;border:none;color:var(--red);font-family:var(--font);font-size:0.75rem;font-weight:700;padding:0.48rem 1rem;border-radius:4px;cursor:pointer;}
+    .btn-dl:hover{opacity:0.9;}
+    .btn-load{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);color:#fff;font-family:var(--font);font-size:0.72rem;padding:0.48rem 0.85rem;border-radius:4px;cursor:pointer;}
+    .btn-load:hover{background:rgba(255,255,255,0.25);}
+    .save-ind{font-size:0.68rem;color:rgba(255,255,255,0.45);}
+    .save-ind.on{color:rgba(255,255,255,0.8);}
+    .layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 50px);}
+    .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1rem 0;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto;}
+    .sid-label{font-size:0.6rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);padding:0 1rem;margin-bottom:0.35rem;}
+    .nav-item{display:block;padding:0.52rem 1rem;color:var(--muted);cursor:pointer;font-size:0.8rem;font-weight:500;border-left:3px solid transparent;transition:all 0.15s;}
+    .nav-item:hover{color:var(--text);background:var(--surface-2);}
+    .nav-item.active{color:var(--text);border-left-color:var(--red);background:var(--surface-2);}
+    .main{padding:1.8rem;overflow-y:auto;}
+    .sec{display:none;}.sec.active{display:block;}
+    .sec-title{font-size:1rem;font-weight:600;margin-bottom:0.25rem;}
+    .sec-desc{font-size:0.76rem;color:var(--muted);margin-bottom:1.4rem;line-height:1.55;}
+    label{display:block;font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;margin-top:0.95rem;}
+    input[type=text],textarea{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:0.84rem;padding:0.6rem 0.8rem;border-radius:4px;outline:none;transition:border-color 0.15s;line-height:1.5;}
+    input[type=text]:focus,textarea:focus{border-color:var(--red);}
+    textarea{resize:vertical;min-height:70px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:1rem;margin-bottom:0.7rem;}
+    .card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.65rem;}
+    .card-lbl{font-size:0.62rem;font-weight:600;letter-spacing:0.12em;color:var(--red);}
+    .btn-rm{background:none;border:1px solid var(--border);color:var(--muted);font-size:0.68rem;padding:0.18rem 0.48rem;border-radius:3px;cursor:pointer;transition:all 0.15s;}
+    .btn-rm:hover{border-color:var(--red);color:var(--red);}
+    .btn-add{background:none;border:1px dashed var(--border);color:var(--muted);font-size:0.76rem;font-weight:500;padding:0.6rem 1rem;border-radius:4px;cursor:pointer;width:100%;margin-top:0.25rem;transition:all 0.15s;}
+    .btn-add:hover{border-color:var(--red);color:var(--red);}
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;}
+    .g3{display:grid;grid-template-columns:1fr 80px 1fr;gap:0.5rem;align-items:end;}
+    .ticker-wrap{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.55rem;}
+    .ttag{display:inline-flex;align-items:center;gap:0.35rem;background:var(--surface-2);border:1px solid var(--border);border-radius:3px;padding:0.22rem 0.55rem;font-size:0.73rem;}
+    .ttag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem;line-height:1;padding:0;transition:color 0.15s;}
+    .ttag button:hover{color:var(--red);}
+    .ticker-row{display:flex;gap:0.45rem;}
+    .ticker-row input{flex:1;}
+    .btn-sm{background:var(--red);border:none;color:#fff;font-family:var(--font);font-size:0.72rem;font-weight:600;padding:0.6rem 0.85rem;border-radius:4px;cursor:pointer;white-space:nowrap;}
+    .btn-sm:hover{background:#991515;}
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green);color:#fff;font-size:0.8rem;font-weight:600;padding:0.65rem 1.1rem;border-radius:5px;transform:translateY(80px);opacity:0;transition:all 0.3s;z-index:9999;}
+    .toast.show{transform:translateY(0);opacity:1;}
+    .divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0;}
+    .wblock{background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:1rem;margin-bottom:0.7rem;}
+    .wblock-lbl{font-size:0.62rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);margin-bottom:0.65rem;}
+  </style>
+</head>
+<body>
+
+<div id="load-screen">
+  <div class="load-box">
+    <div class="load-title">LATE NIGHT <span>BLOOD</span> BOWL</div>
+    <div class="load-sub">Content Editor — drag in your index.html to begin editing</div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('fi1').click()">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <p><strong>Drop your index.html here</strong></p>
+      <p style="margin-top:0.3rem;font-size:0.75rem;">or click to browse</p>
+    </div>
+    <input type="file" id="fi1" accept=".html" style="display:none">
+    <div class="load-or">— or —</div>
+    <button class="btn-fresh" onclick="startFresh()">Start with defaults</button>
+    <div class="resume-box" id="resume-box">
+      <p>Unsaved edits found from <strong id="saved-time">earlier</strong></p>
+      <button class="btn-resume" onclick="doResume()">Resume where I left off</button>
+    </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="header">
+    <div>
+      <h1>LATE NIGHT BLOOD BOWL — CONTENT EDITOR</h1>
+      <p id="save-ind" class="save-ind">No changes yet</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-load" onclick="document.getElementById('fi2').click()">↑ Load new file</button>
+      <input type="file" id="fi2" accept=".html" style="display:none">
+      <button class="btn-dl" onclick="doDownload()">⬇ Download index.html</button>
+    </div>
+  </div>
+  <div class="layout">
+    <nav class="sidebar">
+      <div class="sid-label" style="margin-top:0.2rem">Sections</div>
+      <div class="nav-item active" onclick="nav('hero',this)">🏠 Hero</div>
+      <div class="nav-item" onclick="nav('ticker',this)">📢 Ticker Bar</div>
+      <div class="nav-item" onclick="nav('theme',this)">🎵 Theme Song</div>
+      <div class="nav-item" onclick="nav('manifesto',this)">👁 Welcome / Megara</div>
+      <div class="nav-item" onclick="nav('stars',this)">⭐ The Stars</div>
+      <div class="nav-item" onclick="nav('cup',this)">🏆 The Cup</div>
+      <div class="nav-item" onclick="nav('videos',this)">🎬 Videos</div>
+      <div class="nav-item" onclick="nav('grudge',this)">⚔️ Grudge Sundays</div>
+      <div class="nav-item" onclick="nav('dispatches',this)">📋 Match Reports</div>
+      <div class="nav-item" onclick="nav('workshop',this)">🔧 The Workshop</div>
+      <div class="nav-item" onclick="nav('photos',this)">🖼 Gallery</div>
+      <div class="nav-item" onclick="nav('social',this)">🔗 Social Links</div>
+    </nav>
+    <div class="main">
+
+      <!-- HERO -->
+      <div id="sec-hero" class="sec active">
+        <div class="sec-title">Hero Section</div>
+        <div class="sec-desc">The big dramatic opening. Point bgImage at your Megara image file.</div>
+        <label>Background Image <span style="font-weight:300;text-transform:none;letter-spacing:0">(filename — must be in same folder as index.html)</span></label>
+        <input type="text" id="h-bgImage" oninput="ch()" placeholder="e.g. megara.png">
+        <label>Eyebrow (small line above title)</label>
+        <input type="text" id="h-eyebrow" oninput="ch()">
+        <label>Headline Line 1</label>
+        <input type="text" id="h-line1" oninput="ch()">
+        <label>Headline Line 2 (shows in red)</label>
+        <input type="text" id="h-line2" oninput="ch()">
+        <label>Headline Line 3</label>
+        <input type="text" id="h-line3" oninput="ch()">
+        <label>Subheading</label>
+        <textarea id="h-sub" rows="3" oninput="ch()"></textarea>
+        <label>Button Text</label>
+        <input type="text" id="h-btn" oninput="ch()">
+      </div>
+
+      <!-- TICKER -->
+      <div id="sec-ticker" class="sec">
+        <div class="sec-title">Ticker Bar</div>
+        <div class="sec-desc">The scrolling red strip at the top. Match results, grudge alerts, breaking news from the Cup.</div>
+        <div class="ticker-wrap" id="ticker-tags"></div>
+        <div class="ticker-row">
+          <input type="text" id="ticker-inp" placeholder="Add a new ticker item…" onkeydown="if(event.key==='Enter')addTicker()">
+          <button class="btn-sm" onclick="addTicker()">Add</button>
+        </div>
+      </div>
+
+      <!-- THEME SONG -->
+      <div id="sec-theme" class="sec">
+        <div class="sec-title">Theme Song</div>
+        <div class="sec-desc">Paste a YouTube video ID here to show the theme song player below the hero. Leave blank to hide it entirely. When you record your guitar version, just drop the ID in here.</div>
+        <label>YouTube Video ID <span style="font-weight:300;text-transform:none;letter-spacing:0">(the part after ?v= in the URL)</span></label>
+        <input type="text" id="t-ytid" oninput="ch()" placeholder="e.g. dQw4w9WgXcQ">
+        <label>Song Title</label>
+        <input type="text" id="t-title" oninput="ch()">
+        <label>Credit / Performer</label>
+        <input type="text" id="t-credit" oninput="ch()">
+      </div>
+
+      <!-- MANIFESTO / WELCOME TO THE PITCH -->
+      <div id="sec-manifesto" class="sec">
+        <div class="sec-title">Welcome to the Pitch</div>
+        <div class="sec-desc">Introduction section. Features Megara's image on the left and intro paragraphs on the right. Use &lt;strong&gt; for white highlights and &lt;em&gt; for red.</div>
+        <label>Megara Image File <span style="font-weight:300;text-transform:none;letter-spacing:0">(same folder as index.html)</span></label>
+        <input type="text" id="m-face" oninput="ch()" placeholder="e.g. megara.png">
+        <label>Pull Quote <span style="font-weight:300;text-transform:none;letter-spacing:0">(the big side quote in red)</span></label>
+        <input type="text" id="m-pull" oninput="ch()">
+        <hr class="divider">
+        <div id="manifesto-paras"></div>
+        <button class="btn-add" onclick="addManifestoPara()">+ Add paragraph</button>
+      </div>
+
+      <!-- THE STARS -->
+      <div id="sec-stars" class="sec">
+        <div class="sec-title">The Stars</div>
+        <div class="sec-desc">Featured coaches, players, and characters. Bogroll is locked in as a legend. Add or edit freely.</div>
+        <div id="cred-list"></div>
+        <button class="btn-add" onclick="addCred()">+ Add star</button>
+      </div>
+
+      <!-- THE CUP -->
+      <div id="sec-cup" class="sec">
+        <div class="sec-title">The Cup of Legends</div>
+        <div class="sec-desc">Tournament overview. Numbered steps on the left, closing note on the right.</div>
+        <label>Section Title</label>
+        <input type="text" id="p-title" oninput="ch()">
+        <hr class="divider">
+        <div id="promise-steps"></div>
+        <button class="btn-add" onclick="addStep()">+ Add step</button>
+        <hr class="divider">
+        <label>Closing Note / Caveat</label>
+        <textarea id="p-caveat" rows="3" oninput="ch()"></textarea>
+      </div>
+
+      <!-- VIDEOS -->
+      <div id="sec-videos" class="sec">
+        <div class="sec-title">Videos</div>
+        <div class="sec-desc">The first video is the featured one at the top. The rest go in the Match Vault grid. YouTube IDs only (the part after ?v= in the URL). Leave ID blank to show a placeholder.</div>
+        <div id="video-list"></div>
+        <button class="btn-add" onclick="addVideo()">+ Add video</button>
+      </div>
+
+      <!-- GRUDGE SUNDAYS -->
+      <div id="sec-grudge" class="sec">
+        <div class="sec-title">Grudge Sundays</div>
+        <div class="sec-desc">The eternal scoreboard. Track the all-time series. Update the wins after each Sunday.</div>
+        <div class="g2">
+          <div><label>Section Title</label><input type="text" id="g-title" oninput="ch()"></div>
+          <div><label>Subtitle</label><input type="text" id="g-sub" oninput="ch()"></div>
+        </div>
+        <hr class="divider">
+        <div class="g2">
+          <div><label>Team 1 Name</label><input type="text" id="g-orcTeam" oninput="ch()"></div>
+          <div><label>Team 2 Name</label><input type="text" id="g-humanTeam" oninput="ch()"></div>
+        </div>
+        <div class="g2">
+          <div><label>Team 1 Race</label><input type="text" id="g-orcRace" oninput="ch()"></div>
+          <div><label>Team 2 Race</label><input type="text" id="g-humanRace" oninput="ch()"></div>
+        </div>
+        <hr class="divider">
+        <div class="g3">
+          <div><label>Team 1 Wins</label><input type="text" id="g-orcWins" oninput="ch()" placeholder="7"></div>
+          <div><label>Draws</label><input type="text" id="g-draws" oninput="ch()" placeholder="1"></div>
+          <div><label>Team 2 Wins</label><input type="text" id="g-humanWins" oninput="ch()" placeholder="2"></div>
+        </div>
+        <label>Status Message</label>
+        <textarea id="g-status" rows="2" oninput="ch()"></textarea>
+        <label>Next Match Date</label>
+        <input type="text" id="g-nextDate" oninput="ch()" placeholder="Sunday, 22 June 2026">
+        <label>Venue</label>
+        <input type="text" id="g-nextVenue" oninput="ch()">
+      </div>
+
+      <!-- MATCH REPORTS -->
+      <div id="sec-dispatches" class="sec">
+        <div class="sec-title">Match Reports</div>
+        <div class="sec-desc">Dated match reports. Most recent at the top. Use &lt;strong&gt; for red emphasis.</div>
+        <div id="dispatch-list-ed"></div>
+        <button class="btn-add" onclick="addDispatch()">+ Add report</button>
+      </div>
+
+      <!-- WORKSHOP -->
+      <div id="sec-workshop" class="sec">
+        <div class="sec-title">The Workshop</div>
+        <div class="sec-desc">3D printing and painting — two separate blocks, each with a blurb and stat cards.</div>
+        <div class="wblock">
+          <div class="wblock-lbl">⬡ 3D PRINTING</div>
+          <label>Blurb</label>
+          <textarea id="w-blurb3d" rows="2" oninput="ch()"></textarea>
+          <div style="margin-top:0.8rem;" id="stats3d-list"></div>
+          <button class="btn-add" onclick="addStat3d()">+ Add 3D printing stat</button>
+        </div>
+        <div class="wblock">
+          <div class="wblock-lbl">🎨 PAINTING</div>
+          <label>Blurb</label>
+          <textarea id="w-blurbPaint" rows="2" oninput="ch()"></textarea>
+          <div style="margin-top:0.8rem;" id="statsPaint-list"></div>
+          <button class="btn-add" onclick="addStatPaint()">+ Add painting stat</button>
+        </div>
+      </div>
+
+      <!-- GALLERY -->
+      <div id="sec-photos" class="sec">
+        <div class="sec-title">Gallery</div>
+        <div class="sec-desc">Gallery photos. Featured images span 2 columns and 2 rows. Filenames must be in same folder as index.html.</div>
+        <div id="photo-list"></div>
+        <button class="btn-add" onclick="addPhoto()">+ Add photo</button>
+      </div>
+
+      <!-- SOCIAL -->
+      <div id="sec-social" class="sec">
+        <div class="sec-title">Social Links</div>
+        <div class="sec-desc">Full URLs. Leave blank to hide that platform icon from the nav and footer.</div>
+        <label>YouTube</label>
+        <input type="text" id="soc-youtube" oninput="ch()" placeholder="https://youtube.com/@yourchannel">
+        <label>Instagram</label>
+        <input type="text" id="soc-instagram" oninput="ch()" placeholder="https://instagram.com/yourhandle">
+        <label>Twitter / X</label>
+        <input type="text" id="soc-twitter" oninput="ch()" placeholder="https://x.com/yourhandle">
+        <label>Bluesky</label>
+        <input type="text" id="soc-bluesky" oninput="ch()" placeholder="https://bsky.app/profile/yourhandle">
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ─────────────────────────────────────────────────────
+let S = null;
+let TPL = null;
+
+function get(id) { return document.getElementById(id)?.value || ''; }
+function set(id, v) { const el = document.getElementById(id); if (el) el.value = (v === null || v === undefined) ? '' : String(v); }
+function qs(sel) { return document.querySelector(sel); }
+
+// ── NAV ───────────────────────────────────────────────────────
+function nav(id, el) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── CHANGE / PERSIST ──────────────────────────────────────────
+function ch() {
+  const ind = document.getElementById('save-ind');
+  ind.textContent = 'Unsaved changes'; ind.classList.add('on');
+}
+function persist() {
+  try {
+    localStorage.setItem('lnbb_state', JSON.stringify(S));
+    localStorage.setItem('lnbb_tpl', TPL || '');
+    const now = new Date().toLocaleTimeString();
+    localStorage.setItem('lnbb_ts', now);
+    const ind = document.getElementById('save-ind');
+    ind.textContent = 'Auto-saved ' + now; ind.classList.add('on');
+  } catch(e) {}
+}
+
+// ── DEFAULTS ──────────────────────────────────────────────────
+function getDefaults() {
+  return {
+    hero: {
+      bgImage: './megara.png',
+      eyebrow: 'Leighton Buzzard Cup of Legends · Est. 2024',
+      line1: 'LATE NIGHT', line2: 'BLOOD', line3: 'BOWL',
+      sub: "The game of fantasy football has never been darker, dirtier, or more gloriously chaotic. The Leighton Buzzard Cup of Legends is live. The dice are rolling. Nobody is safe.",
+      btnText: 'Watch the carnage',
+    },
+    ticker: [
+      "GRUDGE SUNDAY: BADLAND BOYZ vs VANE'S VALIANTS — ORCS LEAD THE SERIES 7-2",
+      "BOGROLL THE OGRE EATS ANOTHER REFEREE · MATCH COMMISSIONER UNAVAILABLE FOR COMMENT",
+      "CUP OF LEGENDS SEASON 3 NOW UNDERWAY",
+    ],
+    theme: { youtubeId: '', title: 'Late Night Blood Bowl (Theme)', credit: 'Original composition' },
+    videos: [
+      { id: '', title: 'Cup of Legends S3E01: The Opening Massacre', description: "Season 3 kicks off. Orcs vs Humans. Ended exactly as you'd expect.", episode: 'S3E01' },
+      { id: '', title: 'Grudge Sunday: Bogroll Strikes Again', description: 'Bogroll delivers a performance so devastating the Human coach filed a formal complaint.', episode: 'GS01' },
+    ],
+    dispatches: [
+      { date: 'Jun 2026', text: "The Badland Boyz defeated Vane's Valiants <strong>3-1</strong>." },
+    ],
+    manifesto: {
+      faceImage: './megara.png',
+      pullQuote: "Blood Bowl isn't a sport. It's a calling.",
+      paragraphs: [
+        "Deep in the English Midlands, a group of people decided normal sport wasn't dangerous enough. <strong>So they started playing Blood Bowl.</strong>",
+        "Late Night Blood Bowl is the home of the Leighton Buzzard Cup of Legends. <em>None of this will end well.</em>",
+      ],
+    },
+    credentials: [
+      { icon: '💀', title: 'BOGROLL THE OGRE', desc: "Star player and Leighton Buzzard's most beloved liability.", caveat: '* Currently serving a ban. Reasons classified.' },
+    ],
+    promise: {
+      title: 'THE LEIGHTON BUZZARD CUP OF LEGENDS — WHAT YOU ARE WATCHING',
+      steps: [{ num: '01', text: 'A round-robin Blood Bowl tournament. Multiple teams, one trophy, endless grudges. Season 3 is live.' }],
+      caveat: 'Blood Bowl involves dice. Dice are chaos. All grudges are binding and eternal.',
+    },
+    grudge: {
+      title: 'GRUDGE SUNDAYS', sub: 'The Eternal Fixture',
+      orcTeam: 'BADLAND BOYZ', humanTeam: "VANE'S VALIANTS",
+      orcRace: 'Orcs', humanRace: 'Humans',
+      orcWins: 7, humanWins: 2, draws: 1,
+      status: 'The Orcs are winning. The dice have run out of mercy.',
+      nextDate: 'Sunday, 22 June 2026', nextVenue: 'The Leighton Buzzard Bloodpitch',
+    },
+    workshop: {
+      blurb3d: 'Every model in the Cup of Legends is 3D printed in-house.',
+      blurbPaint: 'Every model is painted by hand.',
+      stats3d: [
+        { num: '47', unit: '', label: 'Models printed' },
+        { num: '3', unit: '', label: 'Printers tried' },
+        { num: '6', unit: 'hrs', label: 'Avg print time' },
+        { num: '2', unit: '', label: 'Failed prints S3' },
+      ],
+      statsPaint: [
+        { num: '12', unit: '', label: 'Fully painted teams' },
+        { num: '3', unit: '', label: "Teams 'in progress'" },
+        { num: '400+', unit: '', label: 'Colours deployed' },
+        { num: '1', unit: '', label: 'Bob Ross incident' },
+      ],
+    },
+    photos: [{ src: './gallery-1.png', caption: 'Season 3 opening day.', featured: true }],
+    social: { twitter: '', bluesky: '', instagram: '', youtube: '' },
+  };
+}
+
+// ── RENDER ALL ────────────────────────────────────────────────
+function renderAll() {
+  renderHero(); renderTicker(); renderTheme(); renderManifesto();
+  renderCreds(); renderPromise(); renderVideos(); renderGrudge();
+  renderDispatches(); renderWorkshop(); renderSocial(); renderPhotos();
+}
+
+function renderHero() {
+  const h = S.hero || {};
+  set('h-bgImage', h.bgImage); set('h-eyebrow', h.eyebrow);
+  set('h-line1', h.line1); set('h-line2', h.line2); set('h-line3', h.line3);
+  set('h-sub', h.sub); set('h-btn', h.btnText);
+}
+
+function renderTicker() {
+  document.getElementById('ticker-tags').innerHTML = (S.ticker || []).map((t, i) => `
+    <span class="ttag">${t.length > 40 ? t.slice(0,40)+'…' : t}
+      <button onclick="rmTicker(${i})" title="Remove">×</button>
+    </span>`).join('');
+}
+
+function renderTheme() {
+  const t = S.theme || {};
+  set('t-ytid', t.youtubeId); set('t-title', t.title); set('t-credit', t.credit);
+}
+
+function renderManifesto() {
+  const m = S.manifesto || {};
+  set('m-face', m.faceImage); set('m-pull', m.pullQuote);
+  document.getElementById('manifesto-paras').innerHTML = (m.paragraphs || []).map((p, i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">PARAGRAPH ${i + 1}</span>
+        <button class="btn-rm" onclick="rmManifestoPara(${i})">Remove</button>
+      </div>
+      <textarea data-mp="${i}" rows="3" oninput="ch()">${p || ''}</textarea>
+    </div>`).join('');
+}
+
+function renderCreds() {
+  document.getElementById('cred-list').innerHTML = (S.credentials || []).map((c, i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">STAR ${i + 1}</span>
+        <button class="btn-rm" onclick="rmCred(${i})">Remove</button>
+      </div>
+      <div class="g2">
+        <div><label>Icon / Emoji</label><input type="text" data-cr-icon="${i}" value="${c.icon || ''}" oninput="ch()"></div>
+        <div><label>Name / Title</label><input type="text" data-cr-title="${i}" value="${(c.title||'').replace(/"/g,'&quot;')}" oninput="ch()"></div>
+      </div>
+      <label>Description</label>
+      <textarea data-cr-desc="${i}" rows="3" oninput="ch()">${c.desc || ''}</textarea>
+      <label>Caveat / Small Print</label>
+      <input type="text" data-cr-caveat="${i}" value="${(c.caveat||'').replace(/"/g,'&quot;')}" oninput="ch()">
+    </div>`).join('');
+}
+
+function renderPromise() {
+  set('p-title', (S.promise || {}).title);
+  set('p-caveat', (S.promise || {}).caveat);
+  document.getElementById('promise-steps').innerHTML = ((S.promise || {}).steps || []).map((s, i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">STEP ${i + 1}</span>
+        <button class="btn-rm" onclick="rmStep(${i})">Remove</button>
+      </div>
+      <div class="g2">
+        <div><label>Number Label</label><input type="text" data-ps-num="${i}" value="${s.num || ''}" oninput="ch()"></div>
+        <div style="grid-column:1 / -1"><label>Text</label><textarea data-ps-text="${i}" rows="2" oninput="ch()">${s.text || ''}</textarea></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderVideos() {
+  document.getElementById('video-list').innerHTML = (S.videos || []).map((v, i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">${i === 0 ? 'FEATURED VIDEO' : `VIDEO ${i + 1}`}</span>
+        <button class="btn-rm" onclick="rmVideo(${i})">Remove</button>
+      </div>
+      <label>YouTube ID <span style="font-weight:300;text-transform:none;letter-spacing:0">(part after ?v= in URL)</span></label>
+      <input type="text" data-vd-id="${i}" value="${v.id || ''}" oninput="ch()" placeholder="e.g. dQw4w9WgXcQ">
+      <label>Title</label>
+      <input type="text" data-vd-title="${i}" value="${(v.title||'').replace(/"/g,'&quot;')}" oninput="ch()">
+      <label>Description</label>
+      <textarea data-vd-desc="${i}" rows="2" oninput="ch()">${v.description || ''}</textarea>
+      <label>Label <span style="font-weight:300;text-transform:none;letter-spacing:0">(e.g. S3E01, GS01, WS01)</span></label>
+      <input type="text" data-vd-ep="${i}" value="${v.episode || ''}" oninput="ch()">
+    </div>`).join('');
+}
+
+function renderGrudge() {
+  const g = S.grudge || {};
+  set('g-title', g.title); set('g-sub', g.sub);
+  set('g-orcTeam', g.orcTeam); set('g-humanTeam', g.humanTeam);
+  set('g-orcRace', g.orcRace); set('g-humanRace', g.humanRace);
+  set('g-orcWins', g.orcWins); set('g-humanWins', g.humanWins); set('g-draws', g.draws);
+  set('g-status', g.status); set('g-nextDate', g.nextDate); set('g-nextVenue', g.nextVenue);
+}
+
+function renderDispatches() {
+  document.getElementById('dispatch-list-ed').innerHTML = (S.dispatches || []).map((d, i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">REPORT ${i + 1}</span>
+        <button class="btn-rm" onclick="rmDispatch(${i})">Remove</button>
+      </div>
+      <label>Date</label>
+      <input type="text" data-dp-date="${i}" value="${d.date || ''}" oninput="ch()">
+      <label>Text <span style="font-weight:300;text-transform:none;letter-spacing:0">(use &lt;strong&gt; for red highlights)</span></label>
+      <textarea data-dp-text="${i}" rows="3" oninput="ch()">${d.text || ''}</textarea>
+    </div>`).join('');
+}
+
+function renderWorkshop() {
+  const w = S.workshop || {};
+  set('w-blurb3d', w.blurb3d); set('w-blurbPaint', w.blurbPaint);
+  document.getElementById('stats3d-list').innerHTML = (w.stats3d || []).map((s, i) => `
+    <div class="card">
+      <div class="card-hd"><span class="card-lbl">3D STAT ${i+1}</span><button class="btn-rm" onclick="rmStat3d(${i})">Remove</button></div>
+      <div class="g3">
+        <div><label>Number</label><input type="text" data-s3d-num="${i}" value="${s.num||''}" oninput="ch()"></div>
+        <div><label>Unit</label><input type="text" data-s3d-unit="${i}" value="${s.unit||''}" oninput="ch()"></div>
+        <div><label>Label</label><input type="text" data-s3d-label="${i}" value="${(s.label||'').replace(/"/g,'&quot;')}" oninput="ch()"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('statsPaint-list').innerHTML = (w.statsPaint || []).map((s, i) => `
+    <div class="card">
+      <div class="card-hd"><span class="card-lbl">PAINT STAT ${i+1}</span><button class="btn-rm" onclick="rmStatPaint(${i})">Remove</button></div>
+      <div class="g3">
+        <div><label>Number</label><input type="text" data-sp-num="${i}" value="${s.num||''}" oninput="ch()"></div>
+        <div><label>Unit</label><input type="text" data-sp-unit="${i}" value="${s.unit||''}" oninput="ch()"></div>
+        <div><label>Label</label><input type="text" data-sp-label="${i}" value="${(s.label||'').replace(/"/g,'&quot;')}" oninput="ch()"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderSocial() {
+  ['twitter','bluesky','instagram','youtube'].forEach(p => set('soc-'+p, (S.social||{})[p]));
+}
+
+function renderPhotos() {
+  document.getElementById('photo-list').innerHTML = (S.photos||[]).map((p,i) => `
+    <div class="card">
+      <div class="card-hd">
+        <span class="card-lbl">PHOTO ${i+1}${p.featured?' · FEATURED':''}</span>
+        <button class="btn-rm" onclick="rmPhoto(${i})">Remove</button>
+      </div>
+      <label>Filename <span style="font-weight:300;text-transform:none;letter-spacing:0">(same folder as index.html)</span></label>
+      <input type="text" data-ph-src="${i}" value="${p.src||''}" oninput="ch()" placeholder="e.g. gallery-1.png">
+      <label>Caption <span style="font-weight:300;text-transform:none;letter-spacing:0">(shows on hover)</span></label>
+      <input type="text" data-ph-cap="${i}" value="${(p.caption||'').replace(/"/g,'&quot;')}" oninput="ch()">
+      <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.8rem;cursor:pointer;">
+        <input type="checkbox" data-ph-ft="${i}" ${p.featured?'checked':''} onchange="ch()" style="width:auto;accent-color:var(--red)">
+        <span>Featured — spans 2 columns &amp; rows</span>
+      </label>
+    </div>`).join('');
+}
+
+// ── SYNC DOM → STATE ──────────────────────────────────────────
+function syncDOM() {
+  if (!S) return;
+  // Hero
+  S.hero.bgImage=get('h-bgImage'); S.hero.eyebrow=get('h-eyebrow');
+  S.hero.line1=get('h-line1'); S.hero.line2=get('h-line2'); S.hero.line3=get('h-line3');
+  S.hero.sub=get('h-sub'); S.hero.btnText=get('h-btn');
+  // Theme
+  if(!S.theme)S.theme={};
+  S.theme.youtubeId=get('t-ytid'); S.theme.title=get('t-title'); S.theme.credit=get('t-credit');
+  // Manifesto
+  S.manifesto.faceImage=get('m-face'); S.manifesto.pullQuote=get('m-pull');
+  S.manifesto.paragraphs=S.manifesto.paragraphs.map((_,i)=>qs(`[data-mp="${i}"]`)?.value||'');
+  // Stars
+  S.credentials=S.credentials.map((_,i)=>({
+    icon: qs(`[data-cr-icon="${i}"]`)?.value||'',
+    title: qs(`[data-cr-title="${i}"]`)?.value||'',
+    desc: qs(`[data-cr-desc="${i}"]`)?.value||'',
+    caveat: qs(`[data-cr-caveat="${i}"]`)?.value||'',
+  }));
+  // Cup
+  S.promise.title=get('p-title'); S.promise.caveat=get('p-caveat');
+  S.promise.steps=S.promise.steps.map((_,i)=>({
+    num: qs(`[data-ps-num="${i}"]`)?.value||'',
+    text: qs(`[data-ps-text="${i}"]`)?.value||'',
+  }));
+  // Videos
+  S.videos=S.videos.map((_,i)=>({
+    id: qs(`[data-vd-id="${i}"]`)?.value||'',
+    title: qs(`[data-vd-title="${i}"]`)?.value||'',
+    description: qs(`[data-vd-desc="${i}"]`)?.value||'',
+    episode: qs(`[data-vd-ep="${i}"]`)?.value||'',
+  }));
+  // Grudge
+  if(!S.grudge)S.grudge={};
+  S.grudge.title=get('g-title'); S.grudge.sub=get('g-sub');
+  S.grudge.orcTeam=get('g-orcTeam'); S.grudge.humanTeam=get('g-humanTeam');
+  S.grudge.orcRace=get('g-orcRace'); S.grudge.humanRace=get('g-humanRace');
+  S.grudge.orcWins=parseInt(get('g-orcWins'))||0;
+  S.grudge.humanWins=parseInt(get('g-humanWins'))||0;
+  S.grudge.draws=parseInt(get('g-draws'))||0;
+  S.grudge.status=get('g-status'); S.grudge.nextDate=get('g-nextDate'); S.grudge.nextVenue=get('g-nextVenue');
+  // Dispatches
+  S.dispatches=S.dispatches.map((_,i)=>({
+    date: qs(`[data-dp-date="${i}"]`)?.value||'',
+    text: qs(`[data-dp-text="${i}"]`)?.value||'',
+  }));
+  // Workshop
+  if(!S.workshop)S.workshop={};
+  S.workshop.blurb3d=get('w-blurb3d'); S.workshop.blurbPaint=get('w-blurbPaint');
+  S.workshop.stats3d=(S.workshop.stats3d||[]).map((_,i)=>({
+    num: qs(`[data-s3d-num="${i}"]`)?.value||'',
+    unit: qs(`[data-s3d-unit="${i}"]`)?.value||'',
+    label: qs(`[data-s3d-label="${i}"]`)?.value||'',
+  }));
+  S.workshop.statsPaint=(S.workshop.statsPaint||[]).map((_,i)=>({
+    num: qs(`[data-sp-num="${i}"]`)?.value||'',
+    unit: qs(`[data-sp-unit="${i}"]`)?.value||'',
+    label: qs(`[data-sp-label="${i}"]`)?.value||'',
+  }));
+  // Social
+  ['twitter','bluesky','instagram','youtube'].forEach(p=>{S.social[p]=get('soc-'+p);});
+  // Photos
+  S.photos=(S.photos||[]).map((_,i)=>({
+    src: qs(`[data-ph-src="${i}"]`)?.value||'',
+    caption: qs(`[data-ph-cap="${i}"]`)?.value||'',
+    featured: qs(`[data-ph-ft="${i}"]`)?.checked||false,
+  }));
+  persist();
+}
+
+// ── ADD / REMOVE ──────────────────────────────────────────────
+function addTicker(){const inp=document.getElementById('ticker-inp');const v=inp.value.trim();if(!v)return;syncDOM();S.ticker.push(v);inp.value='';renderTicker();persist();}
+function rmTicker(i){syncDOM();S.ticker.splice(i,1);renderTicker();persist();}
+function addManifestoPara(){syncDOM();S.manifesto.paragraphs.push('New paragraph...');renderManifesto();persist();}
+function rmManifestoPara(i){syncDOM();S.manifesto.paragraphs.splice(i,1);renderManifesto();persist();}
+function addCred(){syncDOM();S.credentials.push({icon:'⭐',title:'NEW STAR',desc:'',caveat:''});renderCreds();persist();}
+function rmCred(i){syncDOM();S.credentials.splice(i,1);renderCreds();persist();}
+function addStep(){syncDOM();S.promise.steps.push({num:String(S.promise.steps.length+1).padStart(2,'0'),text:''});renderPromise();persist();}
+function rmStep(i){syncDOM();S.promise.steps.splice(i,1);renderPromise();persist();}
+function addVideo(){syncDOM();S.videos.push({id:'',title:'',description:'',episode:''});renderVideos();persist();}
+function rmVideo(i){syncDOM();S.videos.splice(i,1);renderVideos();persist();}
+function addDispatch(){syncDOM();S.dispatches.unshift({date:new Date().toLocaleDateString('en-GB',{month:'short',year:'numeric'}),text:''});renderDispatches();persist();}
+function rmDispatch(i){syncDOM();S.dispatches.splice(i,1);renderDispatches();persist();}
+function addStat3d(){syncDOM();if(!S.workshop.stats3d)S.workshop.stats3d=[];S.workshop.stats3d.push({num:'0',unit:'',label:'New stat'});renderWorkshop();persist();}
+function rmStat3d(i){syncDOM();S.workshop.stats3d.splice(i,1);renderWorkshop();persist();}
+function addStatPaint(){syncDOM();if(!S.workshop.statsPaint)S.workshop.statsPaint=[];S.workshop.statsPaint.push({num:'0',unit:'',label:'New stat'});renderWorkshop();persist();}
+function rmStatPaint(i){syncDOM();S.workshop.statsPaint.splice(i,1);renderWorkshop();persist();}
+function addPhoto(){syncDOM();if(!S.photos)S.photos=[];S.photos.push({src:'',caption:'',featured:false});renderPhotos();persist();}
+function rmPhoto(i){syncDOM();S.photos.splice(i,1);renderPhotos();persist();}
+
+// ── BUILD CONTENT BLOCK ───────────────────────────────────────
+function q(s){return JSON.stringify(String(s===null||s===undefined?'':s));}
+
+function buildBlock(){
+  const c=S;
+  return `const CONTENT = {
+
+  // ── HERO ────────────────────────────────────────────────────
+  hero: {
+    bgImage:  ${q(c.hero.bgImage)},
+    eyebrow:  ${q(c.hero.eyebrow)},
+    line1:    ${q(c.hero.line1)},
+    line2:    ${q(c.hero.line2)},
+    line3:    ${q(c.hero.line3)},
+    sub:      ${q(c.hero.sub)},
+    btnText:  ${q(c.hero.btnText)},
+  },
+
+  // ── TICKER BAR ──────────────────────────────────────────────
+  ticker: [
+${(c.ticker||[]).map(t=>'    '+q(t)+',').join('\n')}
+  ],
+
+  // ── THEME SONG ──────────────────────────────────────────────
+  theme: {
+    youtubeId: ${q((c.theme||{}).youtubeId)},
+    title:     ${q((c.theme||{}).title)},
+    credit:    ${q((c.theme||{}).credit)},
+  },
+
+  // ── VIDEOS ──────────────────────────────────────────────────
+  videos: [
+${(c.videos||[]).map(v=>`    { id: ${q(v.id)}, title: ${q(v.title)}, description: ${q(v.description)}, episode: ${q(v.episode)} },`).join('\n')}
+  ],
+
+  // ── MATCH REPORTS ───────────────────────────────────────────
+  dispatches: [
+${(c.dispatches||[]).map(d=>`    { date: ${q(d.date)}, text: ${q(d.text)} },`).join('\n')}
+  ],
+
+  // ── WELCOME TO THE PITCH ─────────────────────────────────────
+  manifesto: {
+    faceImage: ${q(c.manifesto.faceImage)},
+    pullQuote: ${q(c.manifesto.pullQuote)},
+    paragraphs: [
+${(c.manifesto.paragraphs||[]).map(p=>'      '+q(p)+',').join('\n')}
+    ],
+  },
+
+  // ── THE STARS ───────────────────────────────────────────────
+  credentials: [
+${(c.credentials||[]).map(cr=>`    { icon: ${q(cr.icon)}, title: ${q(cr.title)}, desc: ${q(cr.desc)}, caveat: ${q(cr.caveat)} },`).join('\n')}
+  ],
+
+  // ── THE CUP OF LEGENDS ──────────────────────────────────────
+  promise: {
+    title: ${q(c.promise.title)},
+    steps: [
+${(c.promise.steps||[]).map(s=>`      { num: ${q(s.num)}, text: ${q(s.text)} },`).join('\n')}
+    ],
+    caveat: ${q(c.promise.caveat)},
+  },
+
+  // ── GRUDGE SUNDAY ───────────────────────────────────────────
+  grudge: {
+    title:     ${q((c.grudge||{}).title)},
+    sub:       ${q((c.grudge||{}).sub)},
+    orcTeam:   ${q((c.grudge||{}).orcTeam)},
+    humanTeam: ${q((c.grudge||{}).humanTeam)},
+    orcRace:   ${q((c.grudge||{}).orcRace)},
+    humanRace: ${q((c.grudge||{}).humanRace)},
+    orcWins:   ${Number((c.grudge||{}).orcWins)||0},
+    humanWins: ${Number((c.grudge||{}).humanWins)||0},
+    draws:     ${Number((c.grudge||{}).draws)||0},
+    status:    ${q((c.grudge||{}).status)},
+    nextDate:  ${q((c.grudge||{}).nextDate)},
+    nextVenue: ${q((c.grudge||{}).nextVenue)},
+  },
+
+  // ── THE WORKSHOP ────────────────────────────────────────────
+  workshop: {
+    blurb3d:    ${q((c.workshop||{}).blurb3d)},
+    blurbPaint: ${q((c.workshop||{}).blurbPaint)},
+    stats3d: [
+${((c.workshop||{}).stats3d||[]).map(s=>`      { num: ${q(s.num)}, unit: ${q(s.unit)}, label: ${q(s.label)} },`).join('\n')}
+    ],
+    statsPaint: [
+${((c.workshop||{}).statsPaint||[]).map(s=>`      { num: ${q(s.num)}, unit: ${q(s.unit)}, label: ${q(s.label)} },`).join('\n')}
+    ],
+  },
+
+  // ── GALLERY ──────────────────────────────────────────────────
+  photos: [
+${(c.photos||[]).map(p=>`    { src: ${q(p.src)}, caption: ${q(p.caption)}, featured: ${p.featured?'true':'false'} },`).join('\n')}
+  ],
+
+  // ── SOCIAL LINKS ────────────────────────────────────────────
+  social: {
+    twitter:   ${q(c.social.twitter)},
+    bluesky:   ${q(c.social.bluesky)},
+    instagram: ${q(c.social.instagram)},
+    youtube:   ${q(c.social.youtube)},
+  },
+
+};`;
+}
+
+// ── DOWNLOAD ──────────────────────────────────────────────────
+function doDownload(){
+  syncDOM();persist();
+  const block=buildBlock();
+  if(!TPL){toast('⚠ No file loaded — drag in your index.html first');return;}
+  const output=TPL.replace(/const CONTENT = \{[\s\S]*?\n\};/,block);
+  if(output===TPL){toast('⚠ Could not find CONTENT block in template');return;}
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([output],{type:'text/html'}));
+  a.download='index.html';a.click();
+  toast('✓ Downloaded — drop in same folder as your images');
+}
+
+// ── FILE LOADING ──────────────────────────────────────────────
+function loadHtml(html){
+  TPL=html;
+  try{
+    const m=html.match(/const CONTENT = \{[\s\S]*?\n\};/);
+    if(!m){toast('⚠ Could not find CONTENT block in file');return;}
+    const fn=new Function(m[0]+'; return CONTENT;');
+    const loaded=fn();
+    const defs=getDefaults();
+    S=Object.assign(defs,loaded);
+    if(loaded.workshop)S.workshop=Object.assign(defs.workshop,loaded.workshop);
+    if(loaded.grudge)S.grudge=Object.assign(defs.grudge,loaded.grudge);
+    if(loaded.theme)S.theme=Object.assign(defs.theme,loaded.theme);
+    renderAll();showApp();toast('✓ File loaded successfully');
+  }catch(e){
+    toast('⚠ Error parsing file: '+e.message);console.error(e);
+  }
+}
+
+function showApp(){
+  document.getElementById('load-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+}
+
+function startFresh(){
+  S=getDefaults();TPL=null;
+  renderAll();showApp();
+  toast('⚠ No template loaded — drag in index.html before downloading');
+}
+
+function doResume(){
+  try{
+    const savedS=localStorage.getItem('lnbb_state');
+    const savedTPL=localStorage.getItem('lnbb_tpl');
+    if(savedS){
+      S=Object.assign(getDefaults(),JSON.parse(savedS));
+      TPL=savedTPL||null;
+      renderAll();showApp();toast('✓ Resumed from saved state');
+    }
+  }catch(e){toast('⚠ Could not resume: '+e.message);}
+}
+
+// ── FILE INPUT HANDLERS ───────────────────────────────────────
+function setupFile(id){
+  document.getElementById(id).addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=ev=>loadHtml(ev.target.result);
+    r.readAsText(f);
+  });
+}
+setupFile('fi1');setupFile('fi2');
+
+const dz=document.getElementById('drop-zone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('drag-over');
+  const f=e.dataTransfer.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>loadHtml(ev.target.result);
+  r.readAsText(f);
+});
+
+// ── TOAST ─────────────────────────────────────────────────────
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+const saved=localStorage.getItem('lnbb_state');
+const savedTime=localStorage.getItem('lnbb_ts');
+if(saved){
+  const rb=document.getElementById('resume-box');
+  rb.style.display='block';
+  if(savedTime)document.getElementById('saved-time').textContent=savedTime;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LATE NIGHT BLOOD BOWL</title>
+  <meta name="description" content="The Leighton Buzzard Cup of Legends. Blood Bowl. Late nights. Ancient grudges. Megara Blood-Fox presiding.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg:           #060A12;
+      --surface:      #0D1525;
+      --surface-2:    #121E35;
+      --border:       #1E3050;
+      --red:          #CC1F1F;
+      --red-dark:     #991515;
+      --green:        #1A5C2A;
+      --green-light:  #22803D;
+      --blue:         #1B4FD8;
+      --gold:         #B8860B;
+      --gold-light:   #D4A017;
+      --text:         #F0EDE6;
+      --muted:        #6B7FA0;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-body:    'Inter', sans-serif;
+      --max-w:        1200px;
+      --pad:          clamp(1rem, 4vw, 3rem);
+    }
+
+    /* ─── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* ─── TICKER ─────────────────────────────────────────── */
+    .ticker {
+      background: var(--red);
+      padding: 0.5rem 0;
+      overflow: hidden;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .ticker-track {
+      display: flex;
+      white-space: nowrap;
+      animation: scroll-ticker 60s linear infinite;
+    }
+    .ticker-track:hover { animation-play-state: paused; }
+    .ticker-item {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      color: #fff;
+      padding: 0 2.5rem;
+      flex-shrink: 0;
+    }
+    .ticker-sep { color: rgba(255,255,255,0.35); padding: 0; }
+    @keyframes scroll-ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ─── NAV ────────────────────────────────────────────── */
+    header { border-bottom: 1px solid var(--border); background: var(--bg); }
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem var(--pad);
+      max-width: var(--max-w);
+      margin: 0 auto;
+    }
+    .nav-logo { font-family: var(--font-display); letter-spacing: 0.06em; color: var(--text); line-height: 1; }
+    .nav-logo .logo-top { font-size: 0.7rem; color: var(--muted); display: block; letter-spacing: 0.22em; }
+    .nav-logo .logo-main { font-size: 1.7rem; display: block; line-height: 1; }
+    .nav-logo span { color: var(--red); }
+    .nav-links { display: flex; align-items: center; gap: 1.8rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.68rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-social { display: flex; align-items: center; gap: 1rem; }
+    .nav-social a { color: var(--muted); transition: color 0.2s; display: flex; }
+    .nav-social a:hover { color: var(--red); }
+    .nav-social svg { width: 18px; height: 18px; fill: currentColor; }
+
+    /* ─── HERO ───────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+      background-size: cover;
+      background-position: right center;
+      background-repeat: no-repeat;
+      background-color: var(--surface);
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to right,
+        rgba(6,10,18,1)    0%,
+        rgba(6,10,18,0.97) 35%,
+        rgba(6,10,18,0.6)  65%,
+        rgba(6,10,18,0.15) 100%
+      );
+      z-index: 1; pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(6,10,18,0.5) 0%, transparent 20%,
+        transparent 80%, rgba(6,10,18,0.7) 100%
+      );
+      z-index: 1; pointer-events: none;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: clamp(4rem, 10vw, 8rem) var(--pad) clamp(4rem, 8vw, 7rem);
+      max-width: var(--max-w); margin: 0 auto;
+      min-height: 80vh;
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .hero-eyebrow {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.22em;
+      text-transform: uppercase; color: var(--red); margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.9rem;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: inline-block; width: 28px; height: 2px;
+      background: var(--red); flex-shrink: 0;
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(4.5rem, 15vw, 12rem);
+      line-height: 0.88; letter-spacing: -0.01em;
+      color: var(--text); margin-bottom: 2.5rem;
+    }
+    .hero-title em { font-style: normal; color: var(--red); }
+    .hero-sub {
+      max-width: 480px; font-size: 1rem; font-weight: 300;
+      color: var(--muted); line-height: 1.7; margin-bottom: 2.5rem;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: var(--red); color: #fff;
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em;
+      text-transform: uppercase; padding: 0.9rem 1.8rem; transition: background 0.2s;
+    }
+    .hero-cta:hover { background: var(--red-dark); }
+
+    /* ─── THEME SONG ─────────────────────────────────────── */
+    .theme-section {
+      background: var(--surface); border-bottom: 1px solid var(--border); padding: 1.2rem var(--pad);
+    }
+    .theme-inner {
+      max-width: var(--max-w); margin: 0 auto;
+      display: flex; align-items: center; gap: 1.5rem;
+    }
+    .theme-label {
+      font-family: var(--font-display); font-size: 1rem; letter-spacing: 0.15em;
+      color: var(--gold-light); white-space: nowrap; flex-shrink: 0;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .theme-label svg { width: 18px; height: 18px; fill: var(--gold-light); }
+    .theme-embed { flex: 1; height: 60px; }
+    .theme-embed iframe { width: 100%; height: 100%; border: none; border-radius: 4px; }
+
+    /* ─── SECTION HEADERS ────────────────────────────────── */
+    .section {
+      padding: clamp(3rem, 6vw, 5rem) var(--pad);
+      max-width: var(--max-w); margin: 0 auto;
+    }
+    .section-label {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 2.5rem;
+    }
+    .section-label h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: 0.04em; color: var(--text);
+    }
+    .section-label-line { flex: 1; height: 1px; background: var(--border); }
+    .section-count { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.15em; color: var(--muted); }
+
+    /* ─── MANIFESTO / WELCOME TO THE PITCH ──────────────── */
+    .manifesto { border-bottom: 1px solid var(--border); background: var(--surface); }
+    .manifesto-inner {
+      display: grid; grid-template-columns: 300px 1fr;
+      max-width: var(--max-w); margin: 0 auto;
+    }
+    .manifesto-label {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 3.5vw, 3rem);
+      line-height: 0.92; letter-spacing: 0.04em; color: var(--text);
+      padding: clamp(2rem, 5vw, 4rem) var(--pad);
+      background: var(--surface-2); border-right: 1px solid var(--border);
+    }
+    .manifesto-label span { color: var(--red); display: block; }
+    .manifesto-face-img {
+      width: 100%; aspect-ratio: 3 / 4; object-fit: cover; object-position: center top;
+      display: block; margin-bottom: 1.2rem;
+      filter: contrast(1.08) saturate(0.88); border: 1px solid var(--border);
+    }
+    .manifesto-body {
+      padding: clamp(2rem, 5vw, 4rem) var(--pad);
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+    .manifesto-body p { font-size: 0.98rem; color: var(--muted); line-height: 1.8; }
+    .manifesto-body strong { color: var(--text); font-weight: 500; }
+    .manifesto-body em { color: var(--red); font-style: normal; }
+    .manifesto-pull {
+      border-left: 3px solid var(--red); padding-left: 1.2rem;
+      font-family: var(--font-display);
+      font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+      letter-spacing: 0.03em; color: var(--text); margin: 0.3rem 0; line-height: 1.1;
+    }
+
+    /* ─── THE STARS ──────────────────────────────────────── */
+    .credentials { border-bottom: 1px solid var(--border); }
+    .cred-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+      gap: 2px;
+    }
+    .cred-card {
+      background: var(--surface); padding: 1.8rem 1.4rem;
+      border: 1px solid transparent; transition: border-color 0.2s, background 0.2s;
+    }
+    .cred-card:hover { border-color: var(--border); background: var(--surface-2); }
+    .cred-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+    .cred-title {
+      font-family: var(--font-display); font-size: 1.15rem;
+      letter-spacing: 0.06em; color: var(--text); margin-bottom: 0.6rem; line-height: 1.1;
+    }
+    .cred-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.6rem; }
+    .cred-caveat { font-size: 0.72rem; color: var(--red); font-style: italic; }
+
+    /* ─── THE CUP ────────────────────────────────────────── */
+    .promise { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .promise-inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(3rem, 6vw, 5rem) var(--pad); }
+    .promise-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+      letter-spacing: 0.04em; color: var(--gold-light);
+      max-width: 720px; line-height: 1; margin-bottom: 2.5rem;
+    }
+    .promise-body { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; }
+    .promise-steps { list-style: none; display: flex; flex-direction: column; gap: 1.2rem; }
+    .promise-steps li {
+      display: flex; gap: 1.2rem; align-items: flex-start;
+      font-size: 0.9rem; color: var(--muted); line-height: 1.6;
+    }
+    .promise-steps li span {
+      font-family: var(--font-display); font-size: 1.6rem;
+      color: var(--red); line-height: 1; flex-shrink: 0; width: 2.2rem;
+    }
+
+    /* ─── FEATURED VIDEO ─────────────────────────────────── */
+    .featured-video { border-bottom: 1px solid var(--border); }
+    .featured-inner { padding: clamp(3rem, 6vw, 5rem) var(--pad); max-width: var(--max-w); margin: 0 auto; }
+    .featured-embed {
+      position: relative; aspect-ratio: 16 / 9; background: var(--surface);
+      margin-bottom: 1.5rem; overflow: hidden;
+    }
+    .featured-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    .featured-embed .placeholder {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 1rem; color: var(--muted); font-size: 0.85rem;
+      letter-spacing: 0.1em; text-transform: uppercase; background: var(--surface-2);
+    }
+    .featured-embed .placeholder svg { width: 48px; height: 48px; fill: var(--border); }
+    .featured-meta { display: flex; align-items: baseline; gap: 1.5rem; flex-wrap: wrap; }
+    .featured-tag {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--red);
+    }
+    .featured-title {
+      font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: 0.03em; color: var(--text);
+    }
+    .featured-desc { margin-top: 0.5rem; font-size: 0.9rem; color: var(--muted); max-width: 620px; }
+
+    /* ─── VIDEO GRID ─────────────────────────────────────── */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+      gap: 2px;
+    }
+    .video-card { background: var(--surface); overflow: hidden; }
+    .video-card-embed { position: relative; aspect-ratio: 16 / 9; background: var(--surface-2); }
+    .video-card-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+    .video-card-embed .placeholder {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center; color: var(--border);
+    }
+    .video-card-embed .placeholder svg { width: 36px; height: 36px; fill: currentColor; }
+    .video-card-info { padding: 1rem 1.2rem 1.3rem; }
+    .video-card-num { font-size: 0.65rem; letter-spacing: 0.15em; color: var(--red); margin-bottom: 0.4rem; }
+    .video-card-title {
+      font-family: var(--font-display); font-size: 1.2rem;
+      letter-spacing: 0.04em; color: var(--text); line-height: 1.1; margin-bottom: 0.4rem;
+    }
+    .video-card-desc { font-size: 0.8rem; color: var(--muted); line-height: 1.5; }
+
+    /* ─── GRUDGE SUNDAY ──────────────────────────────────── */
+    .grudge-section {
+      background: var(--surface);
+      border-top: 3px solid var(--red);
+      border-bottom: 3px solid var(--red);
+    }
+    .grudge-inner { max-width: var(--max-w); margin: 0 auto; padding: clamp(3rem, 6vw, 5rem) var(--pad); }
+    .grudge-header { display: flex; align-items: baseline; gap: 1.5rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+    .grudge-header h2 {
+      font-family: var(--font-display); font-size: clamp(2rem, 5vw, 4rem);
+      letter-spacing: 0.04em; color: var(--text);
+    }
+    .grudge-header-sub {
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .grudge-board {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem;
+      align-items: center; margin-bottom: 2rem;
+      background: var(--surface-2); border: 1px solid var(--border); padding: 2.5rem 2rem;
+    }
+    .grudge-team { text-align: center; }
+    .grudge-team-race {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+    }
+    .grudge-team-name {
+      font-family: var(--font-display); font-size: clamp(1.4rem, 3vw, 2.2rem);
+      letter-spacing: 0.04em; color: var(--text); margin-bottom: 1rem;
+    }
+    .grudge-score {
+      font-family: var(--font-display); font-size: clamp(4rem, 10vw, 7rem);
+      letter-spacing: -0.02em; line-height: 1; color: var(--red);
+    }
+    .grudge-mid { text-align: center; }
+    .grudge-vs {
+      font-family: var(--font-display); font-size: 0.85rem;
+      letter-spacing: 0.2em; color: var(--border); margin-bottom: 0.5rem;
+    }
+    .grudge-draws {
+      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); background: var(--bg); border: 1px solid var(--border);
+      padding: 0.3rem 0.7rem; display: inline-block; margin-bottom: 0.5rem;
+    }
+    .grudge-status {
+      font-size: 0.88rem; color: var(--muted); line-height: 1.7;
+      text-align: center; max-width: 560px; margin: 0 auto 1.8rem;
+    }
+    .grudge-next-wrap { text-align: center; }
+    .grudge-next {
+      display: inline-block; border: 1px solid var(--border); padding: 0.9rem 1.6rem;
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text);
+    }
+    .grudge-next strong { color: var(--red); }
+
+    /* ─── MATCH REPORTS ──────────────────────────────────── */
+    .dispatches { border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .dispatch-list { display: flex; flex-direction: column; }
+    .dispatch-item {
+      display: grid; grid-template-columns: 110px 1fr; gap: 2rem;
+      padding: 1.8rem 0; border-bottom: 1px solid var(--border); align-items: start;
+    }
+    .dispatch-item:last-child { border-bottom: none; }
+    .dispatch-date {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); padding-top: 0.2rem;
+    }
+    .dispatch-text { font-size: 0.95rem; color: var(--text); line-height: 1.7; font-weight: 300; }
+    .dispatch-text strong { color: var(--red); font-weight: 500; }
+
+    /* ─── WORKSHOP ───────────────────────────────────────── */
+    .workshop-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .workshop-block-label {
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--green-light); margin-bottom: 0.8rem; padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border); display: block;
+    }
+    .workshop-text { font-size: 0.92rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.4rem; }
+    .workshop-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .stat-card { background: var(--surface); padding: 1.5rem; }
+    .stat-num {
+      font-family: var(--font-display); font-size: 2.5rem;
+      letter-spacing: 0.02em; color: var(--text); line-height: 1; margin-bottom: 0.3rem;
+    }
+    .stat-num span { color: var(--red); }
+    .stat-label {
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+    }
+
+    /* ─── GALLERY ────────────────────────────────────────── */
+    .photo-gallery { border-top: 1px solid var(--border); }
+    .photo-gallery-inner { padding: clamp(3rem, 6vw, 5rem) var(--pad); max-width: var(--max-w); margin: 0 auto; }
+    .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+    .photo-item { position: relative; aspect-ratio: 1; overflow: hidden; background: var(--surface); }
+    .photo-item.featured { grid-column: span 2; grid-row: span 2; }
+    .photo-item img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.4s ease; filter: saturate(0.85) contrast(1.05);
+    }
+    .photo-item:hover img { transform: scale(1.04); }
+    .photo-caption {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 0.7rem 0.9rem;
+      background: linear-gradient(to top, rgba(6,10,18,0.9), transparent);
+      font-size: 0.75rem; color: var(--text); letter-spacing: 0.06em;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .photo-item:hover .photo-caption { opacity: 1; }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer { border-top: 1px solid var(--border); background: var(--surface); }
+    .footer-inner {
+      max-width: var(--max-w); margin: 0 auto; padding: 2.5rem var(--pad);
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem; flex-wrap: wrap;
+    }
+    .footer-logo { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: 0.08em; color: var(--muted); line-height: 1.2; }
+    .footer-logo span { color: var(--red); }
+    .footer-sub {
+      display: block; font-size: 0.6rem; letter-spacing: 0.16em; color: var(--muted);
+      opacity: 0.5; font-family: var(--font-body); font-weight: 300;
+      margin-top: 0.2rem; text-transform: uppercase;
+    }
+    .footer-social { display: flex; gap: 1rem; }
+    .footer-social a { color: var(--muted); transition: color 0.2s; display: flex; }
+    .footer-social a:hover { color: var(--red); }
+    .footer-social svg { width: 18px; height: 18px; fill: currentColor; }
+    .footer-copy { font-size: 0.7rem; color: var(--muted); opacity: 0.5; letter-spacing: 0.06em; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .manifesto-inner { grid-template-columns: 1fr; }
+      .manifesto-label { border-right: none; border-bottom: 1px solid var(--border); }
+      .grudge-board { grid-template-columns: 1fr; }
+      .grudge-score { font-size: 3rem; }
+      .promise-body { grid-template-columns: 1fr; gap: 2rem; }
+      .workshop-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .photo-grid { grid-template-columns: repeat(2, 1fr); }
+      .photo-item.featured { grid-column: span 2; grid-row: span 1; }
+      .nav-links { display: none; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ░░░ TICKER ░░░ -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<!-- ░░░ NAV ░░░ -->
+<header>
+  <nav>
+    <a href="#" class="nav-logo">
+      <span class="logo-top">Late Night</span>
+      <span class="logo-main"><span>BLOOD</span> BOWL</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#videos">Videos</a></li>
+      <li><a href="#grudge-sundays">Grudge Sundays</a></li>
+      <li><a href="#dispatches">Match Reports</a></li>
+      <li><a href="#workshop">Workshop</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#stars">The Stars</a></li>
+    </ul>
+    <div class="nav-social" id="nav-social"></div>
+  </nav>
+</header>
+
+<!-- ░░░ HERO ░░░ -->
+<section class="hero" id="hero-section"></section>
+
+<!-- ░░░ THEME SONG (hidden until youtubeId is set) ░░░ -->
+<div class="theme-section" id="theme-section" style="display:none;">
+  <div class="theme-inner">
+    <div class="theme-label">
+      <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+      THEME SONG
+    </div>
+    <div class="theme-embed" id="theme-embed"></div>
+  </div>
+</div>
+
+<!-- ░░░ WELCOME TO THE PITCH ░░░ -->
+<section class="manifesto" id="about-manifesto">
+  <div class="manifesto-inner">
+    <div class="manifesto-label">
+      <div id="manifesto-face"></div>
+      WELCOME<span>TO</span>THE<span>PITCH</span>
+    </div>
+    <div class="manifesto-body" id="manifesto-body"></div>
+  </div>
+</section>
+
+<!-- ░░░ THE STARS ░░░ -->
+<section class="section credentials" id="stars">
+  <div class="section-label">
+    <h2>THE STARS</h2>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="cred-grid" id="cred-grid"></div>
+</section>
+
+<!-- ░░░ THE CUP ░░░ -->
+<section class="promise">
+  <div class="promise-inner" id="promise-inner"></div>
+</section>
+
+<!-- ░░░ FEATURED VIDEO ░░░ -->
+<section class="featured-video" id="videos">
+  <div class="featured-inner">
+    <div class="section-label">
+      <h2>LATEST</h2>
+      <div class="section-label-line"></div>
+    </div>
+    <div class="featured-embed" id="featured-embed"></div>
+    <div id="featured-meta"></div>
+  </div>
+</section>
+
+<!-- ░░░ MATCH VAULT ░░░ -->
+<section class="section" style="border-bottom:1px solid var(--border);">
+  <div class="section-label">
+    <h2>MATCH VAULT</h2>
+    <div class="section-label-line"></div>
+    <span class="section-count" id="video-count"></span>
+  </div>
+  <div class="video-grid" id="video-grid"></div>
+</section>
+
+<!-- ░░░ GRUDGE SUNDAY ░░░ -->
+<section class="grudge-section" id="grudge-sundays">
+  <div class="grudge-inner" id="grudge-inner"></div>
+</section>
+
+<!-- ░░░ MATCH REPORTS ░░░ -->
+<section class="dispatches" id="dispatches">
+  <div class="section">
+    <div class="section-label">
+      <h2>MATCH REPORTS</h2>
+      <div class="section-label-line"></div>
+    </div>
+    <div class="dispatch-list" id="dispatch-list"></div>
+  </div>
+</section>
+
+<!-- ░░░ THE WORKSHOP ░░░ -->
+<section class="section" id="workshop" style="border-bottom:1px solid var(--border);">
+  <div class="section-label">
+    <h2>THE WORKSHOP</h2>
+    <div class="section-label-line"></div>
+  </div>
+  <div class="workshop-inner" id="workshop-inner"></div>
+</section>
+
+<!-- ░░░ GALLERY ░░░ -->
+<section class="photo-gallery" id="gallery">
+  <div class="photo-gallery-inner">
+    <div class="section-label">
+      <h2>THE GALLERY</h2>
+      <div class="section-label-line"></div>
+    </div>
+    <div class="photo-grid" id="photo-grid"></div>
+  </div>
+</section>
+
+<!-- ░░░ FOOTER ░░░ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">
+        LATE NIGHT <span>BLOOD</span> BOWL
+        <span class="footer-sub">Leighton Buzzard Cup of Legends</span>
+      </div>
+    </div>
+    <div class="footer-social" id="footer-social"></div>
+    <p class="footer-copy" id="footer-copy"></p>
+  </div>
+</footer>
+
+<script>
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  LATE NIGHT BLOOD BOWL — CONTENT CONFIGURATION              ║
+// ║  Edit this object only. Everything is generated from it.    ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+const CONTENT = {
+
+  // ── HERO ────────────────────────────────────────────────────
+  hero: {
+    bgImage:  "./Title.png",
+    eyebrow:  "Leighton Buzzard Cup of Legends · Est. 2026",
+    line1:    "LATE NIGHT",
+    line2:    "Fantasy",
+    line3:    "Football",
+    sub:      "Because we are aparently not allowed to use the B words...The game of fantasy football has never been darker, dirtier, or more gloriously chaotic. The Leighton Buzzard Cup of Legends is live. The dice are rolling. Nobody is safe.",
+    btnText:  "Watch the carnage",
+  },
+
+  // ── TICKER BAR ──────────────────────────────────────────────
+  ticker: [
+    "GRUDGE SUNDAY: BADLAND BOYZ vs VANE'S VALIANTS — ORCS LEAD THE SERIES 7-2",
+    "BOGROLL THE OGRE EATS ANOTHER REFEREE · MATCH COMMISSIONER UNAVAILABLE FOR COMMENT",
+    "CUP OF LEGENDS SEASON 3 NOW UNDERWAY · MAY THE BEST TEAM SURVIVE",
+    "GRUKK FACESMASHA DENIES DELIBERATELY TARGETING HUMANS · 'IT JUST HAPPENS'",
+    "3D PRINT OF THE WEEK: CHAOS WARRIOR BIG GUY — LINK IN BIO",
+    "SYLVARA SWIFTWIND WINS MOST IRRITATING PLAYER AWARD FOR THIRD CONSECUTIVE SEASON",
+    "GROM IRONBEARD STILL HAS NOT FORGOTTEN FEBRUARY · LEDGER UPDATED",
+    "MEGARA BLOOD-FOX CONFIRMS GRUDGE SUNDAY RESCHEDULED · HUMANS REPORTEDLY NERVOUS",
+  ],
+
+  // ── THEME SONG ──────────────────────────────────────────────
+  theme: {
+    youtubeId: "",
+    title:     "Late Night Blood Bowl (Theme)",
+    credit:    "Original composition",
+  },
+
+  // ── VIDEOS ──────────────────────────────────────────────────
+  videos: [
+    { id: "", title: "Cup of Legends S3E01: The Opening Massacre", description: "Season 3 kicks off. Orcs vs Humans. Ended exactly as you'd expect.", episode: "S3E01" },
+    { id: "", title: "Grudge Sunday: Bogroll Strikes Again", description: "Bogroll delivers a performance so devastating the Human coach filed a formal complaint.", episode: "GS01" },
+    { id: "", title: "Workshop: Printing the Skaven Gutter Runner", description: "Full walkthrough — STL source, print settings, support strategy. Comes out perfectly every time.", episode: "WS01" },
+    { id: "", title: "Painting Guide: The Ironbreakers", description: "Grom Ironbeard's Dwarf team gets the full treatment. NMM armour, cold blues, grudge-red accents.", episode: "PG01" },
+  ],
+
+  // ── MATCH REPORTS ───────────────────────────────────────────
+  dispatches: [
+    { date: "Jun 2026", text: "The Badland Boyz defeated Vane's Valiants <strong>3-1</strong> in a match that saw four casualties before halftime. Human coach Sir Aldric Vane described it as 'unsporting'. Orc coach Grukk Facesmasha described it as 'a normal Tuesday'." },
+    { date: "May 2026", text: "Bogroll the Ogre was issued a two-match ban after consuming a lineman during a scrum. <strong>The lineman was eventually recovered.</strong> He did not return to the pitch that evening." },
+    { date: "Apr 2026", text: "Wood Elf coach Sylvara Swiftwind claimed the Fastest Touchdown Award for the third year running. The rest of the Cup found this extremely annoying. Sylvara was, as always, unbothered." },
+    { date: "Mar 2026", text: "First 3D print session of Season 3. 14 Skaven and 2 Chaos Warriors completed. One Chaos Warrior was perfect. The other had what can only be described as a structural personality disorder. <strong>Used it anyway.</strong>" },
+  ],
+
+  // ── WELCOME TO THE PITCH ─────────────────────────────────────
+  manifesto: {
+    faceImage: "./megara.png",
+    pullQuote: "Blood Bowl isn't a sport. It's a calling.",
+    paragraphs: [
+      "Deep in the English Midlands, in a town you have almost certainly never heard of, a group of people decided that normal sport simply wasn't dangerous enough. <strong>So they started playing Blood Bowl.</strong>",
+      "Late Night Blood Bowl is the home of the Leighton Buzzard Cup of Legends — a tournament of reckless ambition, 3D-printed miniatures, disputed dice rolls, and grudges so ancient they have their own filing system. <em>None of this will end well.</em>",
+      "We print our own models. We paint them with varying degrees of success. We play on Sundays. We argue about the rules every single time. We have a theme song. We take none of this seriously and all of it extremely seriously.",
+      "Your guide through this beautiful chaos is <strong>Megara Blood-Fox</strong> — Dark Elf, Cup Commissioner, and the only person who has ever actually read the full Blood Bowl rulebook. She is not sharing what she found in it. Welcome to the pitch.",
+    ],
+  },
+
+  // ── THE STARS ───────────────────────────────────────────────
+  credentials: [
+    { icon: "💀", title: "BOGROLL THE OGRE", desc: "Star player and Leighton Buzzard's most beloved liability. Capable of ending a game in one action — sometimes his own team's. Has caused more friendly-fire casualties than any opposing team in Cup history.", caveat: "* Currently serving a ban. Reasons classified." },
+    { icon: "⚒️", title: "GROM IRONBEARD", desc: "Coach of the Leighton Buzzard Ironbreakers. Dwarf. The most stubborn person in any room he has ever entered. Maintains a physical grudge ledger dating back to the Cup's founding. The ledger is very large.", caveat: "* Still upset about February. Will always be." },
+    { icon: "🐗", title: "GRUKK FACESMASHA", desc: "Coach of the Badland Boyz. Tactical philosophy: go forward, hit things, carry ball. Works at an alarming rate. Has declared a permanent, irrevocable, and non-negotiable grudge against humanity as a species.", caveat: "* Has no concept of an off-season." },
+    { icon: "🛡️", title: "SIR ALDRIC VANE", desc: "Coach of Vane's Valiants. Human team. Tactical. Organised. Genuinely optimistic. Has never beaten the Orcs in eight attempts. Records every match in detail. Has identified nineteen distinct reasons for each loss. Has addressed none of them.", caveat: "* Blames the dice. The dice are innocent." },
+    { icon: "🌿", title: "SYLVARA SWIFTWIND", desc: "Wood Elf coach. Scores from positions that should be physically impossible. Makes it look effortless. Universally regarded as the most infuriating presence in the Cup. Has a trophy cabinet that is the source of significant resentment.", caveat: "* 'It's just the rules.' — Sylvara, continuously." },
+  ],
+
+  // ── THE CUP OF LEGENDS ──────────────────────────────────────
+  promise: {
+    title: "THE LEIGHTON BUZZARD CUP OF LEGENDS — WHAT YOU ARE WATCHING",
+    steps: [
+      { num: "01", text: "A round-robin Blood Bowl tournament. Multiple teams, multiple races, one trophy, and more grudges than any sane competition should contain. Season 3 is live." },
+      { num: "02", text: "Every match is filmed, scored, and logged. Touchdowns, casualties, injuries — recorded for posterity, evidence, and grudge-enforcement purposes." },
+      { num: "03", text: "Grudge Sunday is a sacred institution. The Orcs and the Humans meet. Someone ends up on the floor. The cycle has never once been broken." },
+      { num: "04", text: "Every model in the Cup is 3D printed and painted in-house. The Workshop section documents the full process, including — and especially — the failures." },
+      { num: "05", text: "The Cup champion receives the Leighton Buzzard Trophy of Legends. It is a plastic skull on a piece of reclaimed wood. It is treated with complete and total seriousness." },
+    ],
+    caveat: "Blood Bowl involves dice. Dice are chaos incarnate. The Cup accepts no liability for what the dice decide. All grudges recorded in the ledger are binding and eternal.",
+  },
+
+  // ── GRUDGE SUNDAY ───────────────────────────────────────────
+  grudge: {
+    title:     "GRUDGE SUNDAYS",
+    sub:       "The Eternal Fixture",
+    orcTeam:   "BADLAND BOYZ",
+    humanTeam: "VANE'S VALIANTS",
+    orcRace:   "Orcs",
+    humanRace: "Humans",
+    orcWins:   7,
+    humanWins: 2,
+    draws:     1,
+    status:    "The Orcs are winning. Sir Aldric Vane has run out of tactical explanations. Grukk Facesmasha has run out of patience. The dice have run out of mercy.",
+    nextDate:  "Sunday, 22 June 2026",
+    nextVenue: "The Leighton Buzzard Bloodpitch",
+  },
+
+  // ── THE WORKSHOP ────────────────────────────────────────────
+  workshop: {
+    blurb3d:    "Every model in the Cup of Legends painted. We have painters working around the clock for no pay as they work through their midlife crisises.",
+    blurbPaint: "Every model is painted by hand. Quality ranges from competition-level to 'finished the night before the match with shaky hands and a deadline'.",
+    stats3d: [
+      { num: "47", unit: "", label: "Models printed" },
+      { num: "3", unit: "", label: "Printers tried" },
+      { num: "6", unit: "hrs", label: "Avg print time" },
+      { num: "2", unit: "", label: "Failed prints S3" },
+    ],
+    statsPaint: [
+      { num: "12", unit: "", label: "Fully painted teams" },
+      { num: "3", unit: "", label: "Teams 'in progress'" },
+      { num: "400+", unit: "", label: "Colours deployed" },
+      { num: "1", unit: "", label: "Bob Ross incident" },
+    ],
+  },
+
+  // ── GALLERY ──────────────────────────────────────────────────
+  photos: [
+    { src: "./board 2.png", caption: "Season 3 opening day.", featured: true },
+    { src: "./Board 1.png", caption: "The capital stadium", featured: false },
+    { src: "./Chaos Varrior.png", caption: "Chaos Varrior reassuringly manages VAR. No risk of corruption then...only chaos", featured: false },
+    { src: "./cup.png", caption: "The Trophy which is regularly stolen", featured: false },
+    { src: "./Orgres.png", caption: "Bogroll during the swamp war. Before he become a professional football player", featured: false },
+    { src: "./pitch side lizard.png", caption: "Our pitch side lizard reports in except he usually reports on the game in rap so it's hard to know what's going on.", featured: false },
+    { src: "./Pundit in his day.png", caption: "Surehands Sam on his last and most successful season with the Orc all stars.", featured: false },
+    { src: "./pundit.png", caption: "Surehands Sam here to give his tactical views on all your matches.", featured: false },
+  ],
+
+  // ── SOCIAL LINKS ────────────────────────────────────────────
+  social: {
+    twitter:   "",
+    bluesky:   "",
+    instagram: "",
+    youtube:   "",
+  },
+
+};
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  RENDERING ENGINE — no need to edit below this line         ║
+// ╚══════════════════════════════════════════════════════════════╝
+
+const ICONS = {
+  twitter:   `<svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.741l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
+  bluesky:   `<svg viewBox="0 0 24 24"><path d="M12 10.8c-1.087-2.114-4.046-6.053-6.798-7.995C2.566.944 1.561 1.266.902 1.565.139 1.908 0 3.08 0 3.768c0 .69.378 5.65.624 6.479.815 2.736 3.713 3.66 6.383 3.364.136-.02.275-.039.415-.056-.138.022-.276.04-.415.056-3.912.58-7.387 2.005-2.83 7.078 5.013 5.19 6.87-1.113 7.823-4.308.953 3.195 2.05 9.271 7.733 4.308 4.267-4.308 1.172-6.498-2.74-7.078a8.741 8.741 0 0 1-.415-.056c.14.017.279.036.415.056 2.67.297 5.568-.628 6.383-3.364.246-.828.624-5.79.624-6.478 0-.69-.139-1.861-.902-2.204-.659-.299-1.664-.62-4.3 1.24C16.046 4.748 13.087 8.687 12 10.8z"/></svg>`,
+  instagram: `<svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>`,
+  youtube:   `<svg viewBox="0 0 24 24"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>`,
+};
+
+function buildSocialLinks(container) {
+  Object.entries(CONTENT.social).forEach(([platform, url]) => {
+    if (!url) return;
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.title = platform;
+    a.innerHTML = ICONS[platform] || '';
+    container.appendChild(a);
+  });
+}
+
+function buildHero() {
+  const h = CONTENT.hero;
+  const section = document.getElementById('hero-section');
+  if (h.bgImage) section.style.backgroundImage = `url('${h.bgImage}')`;
+  section.innerHTML = `
+    <div class="hero-content">
+      <p class="hero-eyebrow">${h.eyebrow}</p>
+      <h1 class="hero-title">${h.line1}<br><em>${h.line2}</em><br>${h.line3}</h1>
+      <p class="hero-sub">${h.sub}</p>
+      <a href="#videos" class="hero-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        ${h.btnText}
+      </a>
+    </div>`;
+}
+
+function buildTheme() {
+  const t = CONTENT.theme;
+  if (!t || !t.youtubeId) return;
+  document.getElementById('theme-section').style.display = 'block';
+  document.getElementById('theme-embed').innerHTML =
+    `<iframe src="https://www.youtube.com/embed/${t.youtubeId}" allow="autoplay" allowfullscreen loading="lazy"></iframe>`;
+}
+
+function buildTicker() {
+  const items = [...CONTENT.ticker, ...CONTENT.ticker];
+  const track = document.getElementById('ticker-track');
+  items.forEach(text => {
+    const span = document.createElement('span');
+    span.className = 'ticker-item'; span.textContent = text;
+    track.appendChild(span);
+    const sep = document.createElement('span');
+    sep.className = 'ticker-item ticker-sep'; sep.textContent = '·';
+    track.appendChild(sep);
+  });
+}
+
+function videoEmbed(id) {
+  if (id) {
+    return `<iframe src="https://www.youtube.com/embed/${id}"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen loading="lazy"></iframe>`;
+  }
+  return `<div class="placeholder">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <span>Add your YouTube video ID</span>
+  </div>`;
+}
+
+function buildFeatured() {
+  const v = CONTENT.videos[0];
+  if (!v) return;
+  document.getElementById('featured-embed').innerHTML = videoEmbed(v.id);
+  document.getElementById('featured-meta').innerHTML = `
+    <div class="featured-meta">
+      <span class="featured-tag">Latest</span>
+      <div>
+        <div class="featured-title">${v.title}</div>
+        <div class="featured-desc">${v.description}</div>
+      </div>
+    </div>`;
+}
+
+function buildArchive() {
+  const archive = CONTENT.videos.slice(1);
+  document.getElementById('video-count').textContent = `${archive.length} videos`;
+  const grid = document.getElementById('video-grid');
+  archive.forEach((v, i) => {
+    const card = document.createElement('div');
+    card.className = 'video-card';
+    card.innerHTML = `
+      <div class="video-card-embed">${videoEmbed(v.id)}</div>
+      <div class="video-card-info">
+        <div class="video-card-num">${v.episode || `EP. ${String(i + 2).padStart(2, '0')}`}</div>
+        <div class="video-card-title">${v.title}</div>
+        <div class="video-card-desc">${v.description}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function buildGrudge() {
+  const g = CONTENT.grudge;
+  document.getElementById('grudge-inner').innerHTML = `
+    <div class="grudge-header">
+      <h2>${g.title}</h2>
+      <span class="grudge-header-sub">${g.sub}</span>
+    </div>
+    <div class="grudge-board">
+      <div class="grudge-team">
+        <div class="grudge-team-race">${g.orcRace}</div>
+        <div class="grudge-team-name">${g.orcTeam}</div>
+        <div class="grudge-score">${g.orcWins}</div>
+      </div>
+      <div class="grudge-mid">
+        <div class="grudge-vs">WINS</div>
+        <div class="grudge-draws">${g.draws} DRAW${g.draws !== 1 ? 'S' : ''}</div>
+        <div class="grudge-vs">WINS</div>
+      </div>
+      <div class="grudge-team">
+        <div class="grudge-team-race">${g.humanRace}</div>
+        <div class="grudge-team-name">${g.humanTeam}</div>
+        <div class="grudge-score">${g.humanWins}</div>
+      </div>
+    </div>
+    <p class="grudge-status">${g.status}</p>
+    <div class="grudge-next-wrap">
+      <div class="grudge-next">
+        NEXT GRUDGE SUNDAY — <strong>${g.nextDate}</strong> · ${g.nextVenue}
+      </div>
+    </div>`;
+}
+
+function buildDispatches() {
+  const list = document.getElementById('dispatch-list');
+  CONTENT.dispatches.forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'dispatch-item';
+    item.innerHTML = `<div class="dispatch-date">${d.date}</div><div class="dispatch-text">${d.text}</div>`;
+    list.appendChild(item);
+  });
+}
+
+function buildManifesto() {
+  const { paragraphs, pullQuote, faceImage } = CONTENT.manifesto;
+  const faceEl = document.getElementById('manifesto-face');
+  if (faceEl && faceImage) {
+    const img = document.createElement('img');
+    img.src = faceImage; img.alt = 'Megara Blood-Fox';
+    img.className = 'manifesto-face-img';
+    faceEl.appendChild(img);
+  }
+  const el = document.getElementById('manifesto-body');
+  paragraphs.forEach((p, i) => {
+    if (i === 1) {
+      const pull = document.createElement('blockquote');
+      pull.className = 'manifesto-pull'; pull.textContent = pullQuote;
+      el.appendChild(pull);
+    }
+    const para = document.createElement('p');
+    para.innerHTML = p;
+    el.appendChild(para);
+  });
+}
+
+function buildCredentials() {
+  const grid = document.getElementById('cred-grid');
+  CONTENT.credentials.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'cred-card';
+    card.innerHTML = `
+      <div class="cred-icon">${c.icon}</div>
+      <div class="cred-title">${c.title}</div>
+      <div class="cred-desc">${c.desc}</div>
+      <div class="cred-caveat">${c.caveat}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function buildPromise() {
+  const { title, steps, caveat } = CONTENT.promise;
+  document.getElementById('promise-inner').innerHTML = `
+    <div class="promise-title">${title}</div>
+    <div class="promise-body">
+      <ul class="promise-steps">
+        ${steps.map(s => `<li><span>${s.num}</span>${s.text}</li>`).join('')}
+      </ul>
+      <p style="font-size:0.88rem;color:var(--muted);line-height:1.7;font-style:italic;border-left:3px solid var(--red);padding-left:1.2rem;">${caveat}</p>
+    </div>`;
+}
+
+function buildWorkshop() {
+  const w = CONTENT.workshop;
+  function makeStats(stats) {
+    return `<div class="workshop-stats">
+      ${(stats || []).map(s => `
+        <div class="stat-card">
+          <div class="stat-num">${s.num}<span>${s.unit}</span></div>
+          <div class="stat-label">${s.label}</div>
+        </div>`).join('')}
+    </div>`;
+  }
+  document.getElementById('workshop-inner').innerHTML = `
+    <div>
+      <span class="workshop-block-label">3D PRINTING</span>
+      <p class="workshop-text">${w.blurb3d}</p>
+      ${makeStats(w.stats3d)}
+    </div>
+    <div>
+      <span class="workshop-block-label">PAINTING</span>
+      <p class="workshop-text">${w.blurbPaint}</p>
+      ${makeStats(w.statsPaint)}
+    </div>`;
+}
+
+function buildPhotos() {
+  const photos = CONTENT.photos;
+  if (!photos || photos.length === 0) return;
+  const grid = document.getElementById('photo-grid');
+  photos.forEach(p => {
+    const item = document.createElement('div');
+    item.className = 'photo-item' + (p.featured ? ' featured' : '');
+    item.innerHTML = `
+      <img src="${p.src}" alt="${p.caption || 'Late Night Blood Bowl'}" loading="lazy">
+      ${p.caption ? `<div class="photo-caption">${p.caption}</div>` : ''}`;
+    grid.appendChild(item);
+  });
+}
+
+function buildSocial() {
+  buildSocialLinks(document.getElementById('nav-social'));
+  buildSocialLinks(document.getElementById('footer-social'));
+}
+
+function buildFooter() {
+  document.getElementById('footer-copy').textContent =
+    `© ${new Date().getFullYear()} This website is completely unofficial and in no way endorsed by Games Workshop Limited. Blood Bowl is a copyrighted product of Games Workshop and no rights are contested by this web page or its contents. Games Workshop, the Games Workshop logo, Blood Bowl, and the Blood Bowl logo are trademarks of Games Workshop Limited.`;
+}
+
+buildTicker();
+buildHero();
+buildTheme();
+buildManifesto();
+buildCredentials();
+buildPromise();
+buildFeatured();
+buildArchive();
+buildGrudge();
+buildDispatches();
+buildWorkshop();
+buildPhotos();
+buildSocial();
+buildFooter();
+
+</script>
+</body>
+</html>
